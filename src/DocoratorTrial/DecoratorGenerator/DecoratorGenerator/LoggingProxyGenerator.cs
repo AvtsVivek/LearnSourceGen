@@ -86,7 +86,8 @@ namespace LoggingGenerator
             var i = 0;
             var finalSource = string.Empty;
             finalSource = $@" // Auto-generated code
-            
+using System.CodeDom.Compiler;
+using System.Runtime.CompilerServices;            
 using System;
 namespace {mainMethod.ContainingNamespace.ToDisplayString()}
 {{";
@@ -102,6 +103,8 @@ namespace {mainMethod.ContainingNamespace.ToDisplayString()}
                 i++;
 
                 source = $@"
+    [GeneratedCode(""{mainMethod.ContainingNamespace.ToDisplayString()}.A{i}"", ""x.x.x"")] // Check namespace and version info
+    [CompilerGenerated]
     public class A{i}
     {{
 /*
@@ -149,7 +152,12 @@ The number of interfaces this type impliments is
             var syntaxReceiver = (SyntaxReceiver)context.SyntaxReceiver;
             var loggingTargets = syntaxReceiver.TypeDeclarationsWithAttributes;
 
-            var logSrc = "class LogAttribute : System.Attribute { }";
+            var logSrc = @"
+using System.CodeDom.Compiler;
+using System.Runtime.CompilerServices;
+[GeneratedCode(""LogAttribute"", ""x.x.x"")] // Check the namespace and version
+[CompilerGenerated]
+class LogAttribute : System.Attribute { }";
             context.AddSource("Log.cs", logSrc);
 
             var options = (CSharpParseOptions)compilation.SyntaxTrees.First().Options;
@@ -214,6 +222,8 @@ The number of interfaces this type impliments is
             var sb = new StringBuilder();
             var proxyName = targetType.Name.Substring(1) + "LoggingProxy";
             sb.Append($@"
+using System.CodeDom.Compiler;
+using System.Runtime.CompilerServices;
 using System;
 using System.Text;
 using NLog;
@@ -221,6 +231,9 @@ using System.Diagnostics;
 
 namespace {namespaceName}
 {{
+  [GeneratedCode(""{namespaceName}.LoggingExtensions"", ""x.x.x"")] // Check namespace and version info
+  [CompilerGenerated]
+
   public static partial class LoggingExtensions
   {{
      public static {fullQualifiedName} WithLogging(this {fullQualifiedName} baseInterface)
@@ -340,6 +353,11 @@ namespace {namespaceName}
 
                     // be aware that source generators can start some work on the client's machine with your app's permissions
                     const string moduleInitSource = @"
+using System.CodeDom.Compiler;
+using System.Runtime.CompilerServices;
+
+[GeneratedCode(""Namespace.HackHack"", ""x.x.x"")] // Check namespace and version info
+[CompilerGenerated]
 static class HackHack
 {
   [System.Runtime.CompilerServices.ModuleInitializer]

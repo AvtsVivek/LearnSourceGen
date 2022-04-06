@@ -21,7 +21,13 @@ namespace SourceGenerator
         {
             var compilation = context.Compilation;
 
-            var logSrc = "public class " + _logAttributeName + " : System.Attribute { }";
+            var logSrc = @"
+using System.CodeDom.Compiler;
+using System.Runtime.CompilerServices;
+[GeneratedCode(""LogAttribute"", ""x.x.x"")] // Check the namespace and version
+[CompilerGenerated]
+";
+            logSrc = logSrc + "public class " + _logAttributeName + " : System.Attribute { }";
             context.AddSource("Log.cs", logSrc);
 
             var options = (CSharpParseOptions)compilation.SyntaxTrees.First().Options;
